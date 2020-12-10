@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<link rel="stylesheet" href="css/fukushi.css">
+<title>筋トレChatアプリ</title>
+</head>
+<body>
+
+
+<!-- コンテンツ表示画面 -->
+<!-- <h1>💪さぁ、みんなもっとお互いを讃えよう💪</h1> -->
+<!-- <p class="tittle">💪さぁ、みんなもっとお互いを讃えよう💪</p> -->
+<div class="tittle">
+    💪さぁ、みんな今日も鍛えたお互いを讃えよう💪
+</div>
+<div>
+    <ul>
+        <li class="imgs" data-img="0"><img src="imgs/buke.png" width="200"></li>
+        <li class="imgs" data-img="1"><img src="imgs/tuku.jpg" width="200"></li>
+        <li class="imgs" data-img="2"><img src="imgs/caram.png" width="200"></li>
+    </ul>
+    <div>
+        筋肉名：<input type="text" id="uname">
+    </div>
+    <div>
+        <textarea id="text" cols="30" rows="10">トレーニング内容</textarea>
+        <button id="send">送信</button>
+    </div>
+    <div id="output" style="height:300px; width: 700px; overflow:auto;"></div>
+</div>
+<!--/ コンテンツ表示画面 -->
+
+
+<!-- JQuery -->
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+<!-- JQuery -->
+
+
+<!--** 以下Firebase **-->
+<!-- The core Firebase JS SDK is always required and must be listed first -->
+<script src="https://www.gstatic.com/firebasejs/8.1.2/firebase.js"></script>
+
+<!-- TODO: Add SDKs for Firebase products that you want to use
+     https://firebase.google.com/docs/web/setup#available-libraries -->
+
+<script>
+    // Your web app's Firebase configuration
+        var firebaseConfig = {
+        apiKey: "AIzaSyCr-WyBE5Ti2RQWKIyfW8Usuu0jerVghE8",
+        authDomain: "unit1-1f516.firebaseapp.com",
+        projectId: "unit1-1f516",
+        storageBucket: "unit1-1f516.appspot.com",
+        messagingSenderId: "376770248075",
+        appId: "1:376770248075:web:67571b165835f30e2c038e"
+        };
+    // Initialize Firebase
+        firebase.initializeApp(firebaseConfig);
+
+        const ref = firebase.database().ref();
+    // ref()の中にディレクトリ構造を書くとそのデータ構造で保存できる
+
+
+
+    // アイコン処理
+    let d=0;
+    const img = ["buke.png","tuku.jpg","caram.png"];
+    $(".imgs").on("click",function(){
+        d = $(this).attr("data-img"); //attrをfttrって打ち間違い(T_T)
+    });
+
+
+
+    // 送信イベント
+        $("#send").on("click", function(){
+            // 日時の取得
+                let date = new Date();
+                function sampleDate(date, format) {
+                    format = format.replace(/YYYY/, date.getFullYear());
+                    format = format.replace(/MM/, date.getMonth() + 1);
+                    format = format.replace(/DD/, date.getDate());
+                    format = format.replace(/h/g, date.getHours());
+                    format = format.replace(/m/g, date.getMinutes());
+                    format = format.replace(/s/g, date.getSeconds());
+                    return format;
+                }
+            let postday = sampleDate(date, 'YYYY-MM-DD-h-m-s');
+
+                const uname = $("#uname").val();
+                const text  = $("#text").val();
+                const msg   = {
+                uname: uname,   //送信名:値
+                text: text,     //送信名:値
+                date: postday,
+                icon: d
+                };
+                ref.push(msg);    //サーバーにPush
+        });
+
+
+
+    // 受信イベント
+        ref.on("child_added",function(data){
+            const v = data.val();
+            const k = data.key; //更新と削除に必要らしい
+            const h = '<p><img src="imgs/'+img[v.icon]+'" width="50">'+v.date+'<br>'+v.uname+'<br>'+v.text+'</p>'; 
+            //'<p>'の>のすぐ後ろに入れないとダメ。>'の後に入れてた
+            $("#output").append(h);
+            const tdiv = document.getElementById("output"); //スクロール下部へ移動
+            tdiv.scrollTop = tdiv.scrollHeight;
+        });
+
+
+
+    // // Enterで送信イベント 使いづらいので一旦削除
+    //     $("#text").on("keydown",function(e){
+    //         // 日時の取得
+    //         let date = new Date();
+    //             function sampleDate(date, format) {
+    //                 format = format.replace(/YYYY/, date.getFullYear());
+    //                 format = format.replace(/MM/, date.getMonth() + 1);
+    //                 format = format.replace(/DD/, date.getDate());
+    //                 format = format.replace(/h/g, date.getHours());
+    //                 format = format.replace(/m/g, date.getMinutes());
+    //                 format = format.replace(/s/g, date.getSeconds());
+    //                 return format;
+    //             }
+    //         let postday = sampleDate(date, 'YYYY-MM-DD-h-m-s');
+
+    //         console.log(e.keyCode);
+    //         if(e.keyCode==13){
+    //         const uname = $("#uname").val();
+    //         const text  = $("#text").val();
+    //         const msg   = {
+    //         uname: uname,   //送信名:値
+    //         text: text,     //送信名:値
+    //         date: postday,
+    //         icon: d
+    //         };
+    //         ref.push(msg);    //サーバーにPush
+    //         }
+    //     });
+
+
+
+
+</script>
+
+
+
+</body>
+</html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
