@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <link rel="stylesheet" href="css/fukushi.css">
+    <title>筋トレお絵かきアプリ</title>
+</head>
+
+<body>
+    <div class="tittle">
+        💪さぁ、みんな今日も鍛えたお互いを讃えよう💪
+    </div>
+
+    <h1>今日の成果をアップしよう！</h1>
+
+    <input type="color" id="color">
+    <input type="range" id="range" min="0" max="100" value="10">
+
+    <!-- 画像を読み込み -->
+    <input type="file">
+    <!-- ↓をコメントOUTしてcanvas id="drowarea"を活かす -->
+    <!-- <canvas id="canvas"></canvas> -->
+    <!-- 画像を読み込み -->
+
+    <section>
+
+        <nav>
+            <!-- 線の色を変更するHTML要素 -->
+
+            <!-- 線の太さを変更するHTML要素 -->
+
+            <button id="clear_btn">クリアー</button>
+        </nav>
+        <canvas id="drowarea" width="800" height="300" style="border:1px solid blue;"></canvas>
+    </section>
+
+    <!-- 画像をダウンロード -->
+    <a id="download" href="#" download="canvas.jpg">ダウンロード</a>
+    <!-- 画像をダウンロード -->
+
+    <h1>今日の成果を共有しよう！</h1>
+    <div>
+        <ul>
+            <li class="imgs" data-img="0"><img src="imgs/buke.png" width="200"></li>
+            <li class="imgs" data-img="1"><img src="imgs/tuku.jpg" width="200"></li>
+            <li class="imgs" data-img="2"><img src="imgs/caram.png" width="200"></li>
+        </ul>
+        <div>
+            部位：<input type="text" id="uname">
+        </div>
+        <div>
+            <textarea id="text" cols="30" rows="10">トレーニング内容</textarea>
+            <button id="send">送信</button>
+        </div>
+        <div id="output" style="height:150px; width: 700px; overflow:auto;"></div>
+    </div>
+
+    <!-- JQuery -->
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+<!-- JQuery -->
+
+
+<!--** 以下Firebase **-->
+<!-- The core Firebase JS SDK is always required and must be listed first -->
+<script src="https://www.gstatic.com/firebasejs/8.1.2/firebase.js"></script>
+
+<!-- TODO: Add SDKs for Firebase products that you want to use
+     https://firebase.google.com/docs/web/setup#available-libraries -->
+
+
+    <script src="js/jquery-2.1.3.min.js"></script>
+    <script>
+
+// 画像を読み込み
+    const canvas = document.getElementById("drowarea")
+
+    document.querySelector('input[type="file"]').onchange = function() {
+        let img = this.files[0]
+        let reader = new FileReader()
+        reader.readAsDataURL(img)
+        reader.onload = function() {
+            drawImage(reader.result)
+        }
+    }
+
+    function drawImage(url) {
+        let ctx = canvas.getContext('2d')
+        let image = new Image()
+        image.src = url
+        image.onload = () => {
+            canvas.width = image.width
+            canvas.height = image.height
+            ctx.drawImage(image, 0, 0)
+        }
+    }
+// 画像を読み込み
+
+$("#color").on("change",function(){ //チェンジイベント。clickじゃなくchange
+    const c = $(this).val(); //色の取得。thisは直前のイベントを参照する
+    color=c;
+});
+
+$("#range").on("change",function(){
+        const r = $(this).val(); //スライダーの値を取得
+        bold_line=r;
+    });
+
+        //初期化(変数letで宣言)
+        let canvas_mouse_event = false; //スイッチ [ true=線を引く, false=線は引かない ]  ＊＊＊
+        let oldX = 0; //１つ前の座標を代入するための変数
+        let oldY = 0; //１つ前の座標を代入するための変数
+        let bold_line = 3; //ラインの太さをここで指定
+        let color = "#ccc"; //ラインの色をここで指定
+
+        //------------------------------------------------
+        //const can = $("#drowarea")[0]; //CanvasElement
+        //const ctx = can.getContext("2d"); //描画するための準備！
+        //------------------------------------------------
+        //上2つのスクリプトを記述します。
+        const can = $("#drowarea")[0]; //CanvasElement
+        const ctx = can.getContext("2d"); //描画するための準備！
+
+
+
+
+        //mousedown：フラグをTrue
+        //-----------------------------------------------
+        //oldX = e.offsetX;       //MOUSEDOWNしたX横座標取得
+        //oldY = e.offsetY; //MOUSEDOWN Y高さ座標取得
+        //canvas_mouse_event=true;
+        //-----------------------------------------------
+        //上5つのスクリプトを記述します。
+        $(can).on("mousedown",function(e){
+            console.log(e);
+            oldX = e.offsetX; //現在地点XをoldXに代入
+            oldY = e.offsetY; //現在地点YをoldYに代入
+            canvas_mouse_event = true; //スイッチオン。書くぞ
+        });
+        
+
+        //mousemove：フラグがTrueだったら描く ※e：イベント引数取得
+        //----------------------------------------------
+        //  if(canvas_mouse_event==true){
+        //      const px = e.offsetX;
+        //      const py = e.offsetY;
+        //      ctx.strokeStyle = color;
+        //      ctx.lineWidth = bold_line;
+        //      ctx.beginPath();
+        //      ctx.lineJoin= "round";
+        //      ctx.lineCap = "round";
+        //      ctx.moveTo(oldX, oldY);
+        //      ctx.lineTo(px, py);
+        //      ctx.stroke();
+        //      oldX = px;
+        //      oldY = py;
+        //  }
+        $(can).on("mousemove",function(e){
+            console.log(e.offsetX);
+            if(canvas_mouse_event==true){
+                const px = e.offsetX;
+                const py = e.offsetY;
+                ctx.strokeStyle = color;
+                ctx.lineWidth = bold_line;
+                ctx.beginPath();
+                ctx.lineJoin= "round";
+                ctx.lineCap = "round";
+                ctx.moveTo(oldX, oldY);
+                ctx.lineTo(px, py);
+                ctx.stroke();
+                oldX = px; //現在地点を基点に入れ替え
+                oldY = py; //現在地点を基点に入れ替え
+            }
+        });
+
+        //mouseup：フラグをfalse
+        //------------------------------------------------
+        //    canvas_mouse_event=false;
+        //------------------------------------------------
+$(can).on("mouseup",function(){
+    canvas_mouse_event=false;
+});
+
+// ↓試したけど動かない？本当に動く？
+// $(can).on("mousedoun",function(){
+//     canvas_mouse_event=false;
+// });
+
+        //#clear_btn：クリアーボタンAction
+        //-----------------------------------------------------------------
+        //    ctx.beginPath();
+        //    ctx.clearRect(0, 0, can.width, can.height);
+        //-----------------------------------------------------------------
+
+$("#clear_btn").on("click",function(){
+    ctx.beginPath();
+    ctx.clearRect(0, 0, can.width, can.height);
+});
+
+$(can).on("mouseout",function(){ //一番上に入れちゃダメ。他のjsの邪魔する
+    canvas_mouse_event=false;
+    console.log("mouseout");
+});
+
+// 画像を保存
+    $("#download").click(function(){
+    drowarea = document.getElementById('drowarea'); //ここでcanvasのIDを指定しないとダウンロードされない
+    var base64 = canvas.toDataURL("image/jpeg");
+    document.getElementById("download").href = base64;
+    });
+// 画像を保存
+
+    // Your web app's Firebase configuration
+    var firebaseConfig = {
+        apiKey: "AIzaSyCr-WyBE5Ti2RQWKIyfW8Usuu0jerVghE8",
+        authDomain: "unit1-1f516.firebaseapp.com",
+        projectId: "unit1-1f516",
+        storageBucket: "unit1-1f516.appspot.com",
+        messagingSenderId: "376770248075",
+        appId: "1:376770248075:web:67571b165835f30e2c038e"
+        };
+    // Initialize Firebase
+        firebase.initializeApp(firebaseConfig);
+
+        const ref = firebase.database().ref();
+    // ref()の中にディレクトリ構造を書くとそのデータ構造で保存できる
+
+
+
+    // アイコン処理
+    let d=0;
+    const img = ["buke.png","tuku.jpg","caram.png"];
+    $(".imgs").on("click",function(){
+        d = $(this).attr("data-img"); //attrをfttrって打ち間違い(T_T)
+    });
+
+
+
+    // 送信イベント
+        $("#send").on("click", function(){
+            // 日時の取得
+                let date = new Date();
+                function sampleDate(date, format) {
+                    format = format.replace(/YYYY/, date.getFullYear());
+                    format = format.replace(/MM/, date.getMonth() + 1);
+                    format = format.replace(/DD/, date.getDate());
+                    format = format.replace(/h/g, date.getHours());
+                    format = format.replace(/m/g, date.getMinutes());
+                    format = format.replace(/s/g, date.getSeconds());
+                    return format;
+                }
+            let postday = sampleDate(date, 'YYYY-MM-DD-h-m-s');
+
+                const uname = $("#uname").val();
+                const text  = $("#text").val();
+                const msg   = {
+                uname: uname,   //送信名:値
+                text: text,     //送信名:値
+                date: postday,
+                icon: d
+                };
+                ref.push(msg);    //サーバーにPush
+        });
+
+
+
+    // 受信イベント
+        ref.on("child_added",function(data){
+            const v = data.val();
+            const k = data.key; //更新と削除に必要らしい
+            const h = '<p><img src="imgs/'+img[v.icon]+'" width="50">'+v.date+'<br>'+v.uname+'<br>'+v.text+'</p>'; 
+            //'<p>'の>のすぐ後ろに入れないとダメ。>'の後に入れてた
+            $("#output").append(h);
+            const tdiv = document.getElementById("output"); //スクロール下部へ移動
+            tdiv.scrollTop = tdiv.scrollHeight;
+        });
+
+    </script>
+</body>
+
+</html>

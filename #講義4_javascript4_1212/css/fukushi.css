@@ -1,0 +1,25 @@
+li {
+    display: inline;
+    }
+
+body{ 
+    background-color:#FEDD00;
+    color : #000000;
+    margin: auto;
+    width:800px;
+    }
+
+.tittle{
+    background-color: #000000;
+    text-align: center;
+    color: #FEDD00;
+    font-size:xx-large
+}
+
+.download{
+    background-color: #000000;
+    text-align: center;
+    color: #FEDD00;
+    font-size:xx-large
+}
+
