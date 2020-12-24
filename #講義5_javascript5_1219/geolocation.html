@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Map:Geolocation</title>
+<style>html,body{height:100%;}body{padding:0;margin:0;}h1{padding:0;margin:0;font-size:50%;}</style>
+</head>
+<body>
+
+    <div>
+        アクセスキーを入力<input id="key" value="dc3822130c430ba378d03078271343b0" type="text" size="45">
+        <!-- <div id="geocode_lat" value="">geocode:data</div> 
+        <div id="geocode_lot" value="">geocode:data</div>  
+        ここには表示出来た。lattolonに分けて表示したい -->
+
+        <input type="button" id="btn" value="送信"><br>
+        <div id="geocode_lat" value="geocode_lat">geocode:data</div> 
+        <div id="geocode_lot" value="geocode_lat">geocode:data</div>  
+        緯度lat: <input type="text" id="lat" value="">
+        経度lon: <input type="text" id="lon" value="">
+        <!-- バリューに代入したい -->
+        <!-- 代入じゃなく直接 -->
+    </div>
+    <table id="table">
+        <tr>
+            <th>店舗名</th>
+            <th>営業時間</th>
+        </tr>
+    </table>
+
+
+<!-- MAP[START] -->
+<h1>Map:Geolocation</h1>
+<div id="myMap" style='width:60%;height:70%;float:left;'></div>
+<!-- MAP[END] -->
+
+
+<script src='https://www.bing.com/api/maps/mapcontrol?callback=GetMap&key=AuGoZqfxbDXiqs29xIi09ErnyLMQEoPV3iiSsieES7gYMbkAXsy-0kJC71hX4BsZ' async defer></script>
+<script src="../js/BmapQuery.js"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+<script>
+//****************************************************************************************
+// BingMaps&BmapQuery
+//****************************************************************************************
+//Init
+function GetMap(){
+    //------------------------------------------------------------------------
+    //1. Instance
+    //------------------------------------------------------------------------
+    const map = new Bmap("#myMap");
+
+    //------------------------------------------------------------------------
+    //2. geolocation: Display Map
+    //   map.geolocation(function(data:object){...});
+    //------------------------------------------------------------------------
+    map.geolocation(function(data) {
+        //location
+        const lat = data.coords.latitude;
+        const lon = data.coords.longitude;
+        //Map
+        map.startMap(lat, lon, "load", 10);
+        //pin
+        map.pin(lat,lon,"#ff0000");
+        document.querySelector("#geocode_lat").innerHTML=lat;
+        document.querySelector("#geocode_lot").innerHTML=lon;
+    });
+}
+
+// //*****************************************************
+// // 取得した緯度経度をinputのバリュにー入れたい
+// //*****************************************************
+// $(function(){
+//   $('[geocode_lat],[geocode_lot]').on('input',function(){
+//     var v1=$('[geocode_lat]').val();
+//     var v2=$('[geocode_lot]').val();
+//     $('[lat]').val((v1));
+//     $('[lon]').val((v2);
+//   });
+// });
+
+//*****************************************************
+// Click Event
+// ぐるなびAPIへデータRequest → APIサーバーからresponseデータ取得
+//*****************************************************
+$("#btn").on("click", function() {
+    //送信データをObject変数で用意
+    //参考URL:https://api.gnavi.co.jp/api/manual/restsearch/
+    const data = {
+        keyid:$("#key").val(),
+        latitude:$("#lat").val(),
+        longitude:$("#lon").val(),
+        range:4, //ここの,抜けてて表示件数増やせなかった
+        hit_per_page:30
+    };
+    //Ajax（非同期通信）
+    axios.get('https://api.gnavi.co.jp/RestSearchAPI/v3/', {
+        params:data
+    })
+        .then(function (response) {
+        //データ受信成功！！showData関数にデータを渡す
+        showData(response.data);
+    }).catch(function (error) {
+        console.log(error);//通信Error
+    }).then(function () {
+        //console.log("Last");//通信OK/Error後に処理を必ずさせたい場合
+    });
+});
+
+//*****************************************************
+//ぐるなびデータ表示処理
+//*****************************************************
+function showData(data){
+    //データ確認用
+    console.log(data.rest);
+
+
+    //データを繰り返し処理で取得
+    const len  = data.rest.length; //データ数を取得
+    for(let i=0; i<len; i++){
+        const shop_image1 = '<img src="'+data.rest[i].image_url.shop_image1+'">';
+        $("#table").append('<tr><td>' + data.rest[i].name + '</td><td>' + data.rest[i].latitude + '</td><td>' + data.rest[i].longitude + '</td><td>' + data.rest[i].opentime + shop_image1 + '</td></tr>');
+    };
+}
+
+</script>
+</body>
+</html>
