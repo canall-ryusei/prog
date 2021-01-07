@@ -1,0 +1,8 @@
+table {
+  border-collapse: collapse;
+  border: solid 2px rgb(0, 209, 0);/*表全体を線で囲う*/
+}
+table th, table td {
+  border: dashed 1px rgb(0, 209, 0);/**/
+  /*破線 1px オレンジ*/
+}
